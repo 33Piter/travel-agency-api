@@ -164,4 +164,24 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(401)
             ->assertJson(['error' => 'The informed token is not valid or the user is not authorized. Please log in to access your travel orders.']);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tests for refresh token method
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    public function test_user_can_refresh_token()
+    {
+        $user = User::factory()->create();
+        $token = auth()->login($user);
+
+        $response = $this->withHeader('Authorization', "Bearer $token")
+            ->getJson(route('auth.refresh'));
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['access_token', 'token_type', 'expires_in']);
+    }
+
 }
