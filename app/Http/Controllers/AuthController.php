@@ -27,9 +27,9 @@ class AuthController extends Controller
         }
     }
 
-    public function getUser()
+    public function getUser(): JsonResponse
     {
-        //
+        return response()->json(auth()->user());
     }
 
     public function logout()
