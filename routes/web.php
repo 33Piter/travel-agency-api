@@ -3,15 +3,20 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    return <<<ASCII
+    <body style="background-color: Canvas;color: CanvasText;color-scheme: light dark;">
+    <pre>
+    /============================================================================================\
+    || _______                  _                                                  _____ _____  ||
+    |||__   __|                | |     /\                                    /\   |  __ \_   _| ||
+    ||   | |_ __ __ ___   _____| |    /  \   __ _  ___ _ __   ___ _   _     /  \  | |__) || |   ||
+    ||   | | '__/ _` \ \ / / _ \ |   / /\ \ / _` |/ _ \ '_ \ / __| | | |   / /\ \ |  ___/ | |   ||
+    ||   | | | | (_| |\ V /  __/ |  / ____ \ (_| |  __/ | | | (__| |_| |  / ____ \| |    _| |_  ||
+    ||   |_|_|  \__,_| \_/ \___|_| /_/    \_\__, |\___|_| |_|\___|\__, | /_/    \_\_|   |_____| ||
+    ||                                       __/ |                 __/ |                        ||
+    ||                                      |___/                 |___/                         ||
+    \============================================================================================/
+    </pre>
+    </body>
+    ASCII;
 });
