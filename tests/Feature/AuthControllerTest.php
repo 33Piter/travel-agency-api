@@ -11,6 +11,27 @@ class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected User $user;
+    protected User $otherUser;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->token = $this->getToken($this->user->email, 'password');
+    }
+
+    private function getToken(string $email, string $password): string
+    {
+        $response = $this->postJson(route('auth.login'), [
+            'email' => $email,
+            'password' => $password,
+        ]);
+
+        return $response->json('token');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Tests for register method
@@ -86,5 +107,34 @@ class AuthControllerTest extends TestCase
 
         $response->assertStatus(401)
             ->assertJson(['message' => 'Invalid credentials']);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tests for getUser method
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    public function test_authenticated_user_can_get_user()
+    {
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->getJson(route('auth.user'));
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'email' => $this->user->email,
+            ]);
+    }
+
+    public function test_get_user_fails_with_invalid_token()
+    {
+        $response = $this->withHeader('Authorization', 'Bearer invalid-token')
+            ->getJson(route('auth.user'));
+
+        $response->assertStatus(401)
+            ->assertJson(['error' => 'The informed token is not valid or the user is not authorized. Please log in to access your travel orders.']);
     }
 }
