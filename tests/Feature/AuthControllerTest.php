@@ -137,4 +137,31 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(401)
             ->assertJson(['error' => 'The informed token is not valid or the user is not authorized. Please log in to access your travel orders.']);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tests for logout method
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    public function test_user_can_logout()
+    {
+        $user = User::factory()->create();
+        $token = auth()->login($user);
+
+        $response = $this->withHeader('Authorization', "Bearer $token")
+            ->getJson(route('auth.logout'));
+
+        $response->assertStatus(200)
+            ->assertJson(['message' => 'Successfully logged out']);
+    }
+
+    public function test_logout_fails_without_token()
+    {
+        $response = $this->getJson(route('auth.logout'));
+
+        $response->assertStatus(401)
+            ->assertJson(['error' => 'The informed token is not valid or the user is not authorized. Please log in to access your travel orders.']);
+    }
 }
