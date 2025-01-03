@@ -2,27 +2,33 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\TravelOrderStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTravelOrderRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'status' => 'required|string|in:'.implode(',', [
+                TravelOrderStatusEnum::APPROVED->value,
+                TravelOrderStatusEnum::CANCELED->value,
+            ]),
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'status.required' => 'The status is required.',
+            'status.string' => 'The status must be a string.',
+            'status.in' => 'The status must be one of the following: '.
+                TravelOrderStatusEnum::APPROVED->value.' or '.TravelOrderStatusEnum::CANCELED->value,
         ];
     }
 }
