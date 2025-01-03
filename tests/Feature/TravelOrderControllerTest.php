@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Enums\TravelOrderStatusEnum;
+use App\Mail\TravelOrderStatusUpdated;
 use App\Models\TravelOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class TravelOrderControllerTest extends TestCase
@@ -377,4 +379,71 @@ class TravelOrderControllerTest extends TestCase
         ]);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Tests for notify method
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    public function test_notification_is_sent_to_applicant_email()
+    {
+        $travelOrder = TravelOrder::factory()->create([
+            'user_id' => $this->user->id,
+            'applicant_email' => 'applicant@example.com',
+        ]);
+
+        Mail::fake();
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->getJson(route('travel-order.notify', $travelOrder->id));
+
+        $response->assertStatus(200)
+            ->assertJson(['message' => 'Notification sent successfully.']);
+
+        Mail::assertSent(TravelOrderStatusUpdated::class, function ($mail) use ($travelOrder) {
+            return $mail->hasTo('applicant@example.com') &&
+                $mail->travelOrder->is($travelOrder);
+        });
+    }
+
+    public function test_user_cannot_send_notification_of_another_user()
+    {
+        $travelOrder = TravelOrder::factory()->create([
+            'user_id' => $this->otherUser->id,
+            'applicant_email' => 'applicant@example.com',
+        ]);
+
+        Mail::fake();
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->getJson(route('travel-order.notify', $travelOrder->id));
+
+        $response->assertStatus(403)
+            ->assertJson(['message' => 'You are not authorized to notify this travel order.']);
+
+        Mail::assertNothingSent();
+    }
+
+    public function test_notification_fails_for_non_existent_travel_order()
+    {
+        $nonExistentId = 9999;
+
+        Mail::fake();
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->getJson(route('travel-order.notify', $nonExistentId));
+
+        $response->assertStatus(404);
+
+        Mail::assertNothingSent();
+    }
+
+    public function test_notification_requires_authentication()
+    {
+        $response = $this->getJson(route('travel-order.notify', $this->travelOrder->id));
+
+        $response->assertStatus(401)
+            ->assertJson(['error' => 'The informed token is not valid or the user is not authorized. Please log in to access your travel orders.']);
+    }
 }
