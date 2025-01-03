@@ -125,4 +125,37 @@ class TravelOrderControllerTest extends TestCase
         $response->assertStatus(401)
             ->assertJson(['error' => 'The informed token is not valid or the user is not authorized. Please log in to access your travel orders.']);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tests for show method
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    public function test_user_can_view_own_travel_order()
+    {
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->getJson(route('travel-order.show', $this->travelOrder->id));
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['id', 'applicant_name', 'destination', 'departure_date', 'return_date', 'status']);
+    }
+
+    public function test_user_cannot_view_others_travel_order()
+    {
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->otherUserToken)
+            ->getJson(route('travel-order.show', $this->travelOrder->id));
+
+        $response->assertStatus(403)
+            ->assertJson(['message' => 'You are not authorized to view this travel order.']);
+    }
+
+    public function test_guest_cannot_view_travel_order()
+    {
+        $response = $this->getJson(route('travel-order.show', $this->travelOrder->id));
+
+        $response->assertStatus(401)
+            ->assertJson(['error' => 'The informed token is not valid or the user is not authorized. Please log in to access your travel orders.']);
+    }
 }
