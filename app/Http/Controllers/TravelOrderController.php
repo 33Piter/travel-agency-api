@@ -2,64 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IndexTravelOrderRequest;
 use App\Http\Requests\StoreTravelOrderRequest;
 use App\Http\Requests\UpdateTravelOrderRequest;
+use App\Http\Resources\TravelOrderResource;
 use App\Models\TravelOrder;
+use Illuminate\Http\JsonResponse;
 
 class TravelOrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(IndexTravelOrderRequest $request)
     {
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreTravelOrderRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(TravelOrder $travelOrder)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(TravelOrder $travelOrder)
+    public function store(StoreTravelOrderRequest $request): JsonResponse
     {
-        //
+        $requestData = $request->validated();
+        $requestData['user_id'] = auth()->user()->id;
+        $travelOrder = TravelOrder::create($requestData);
+
+        return response()->json([
+            'message' => 'Travel order created successfully.',
+            'data' => new TravelOrderResource($travelOrder),
+        ], 201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateTravelOrderRequest $request, TravelOrder $travelOrder)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(TravelOrder $travelOrder)
+    public function notify(TravelOrder $travelOrder)
     {
         //
     }
