@@ -6,9 +6,11 @@ use App\Http\Requests\IndexTravelOrderRequest;
 use App\Http\Requests\StoreTravelOrderRequest;
 use App\Http\Requests\UpdateTravelOrderRequest;
 use App\Http\Resources\TravelOrderResource;
+use App\Mail\TravelOrderStatusUpdated;
 use App\Models\TravelOrder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Mail;
 
 class TravelOrderController extends Controller
 {
@@ -69,8 +71,18 @@ class TravelOrderController extends Controller
         ]);
     }
 
-    public function notify(TravelOrder $travelOrder)
+    public function notify(TravelOrder $travelOrder): JsonResponse
     {
-        //
+        if ($travelOrder->user_id !== auth()->id()) {
+            return response()->json(['message' => 'You are not authorized to notify this travel order.'], 403);
+        }
+
+        try {
+            Mail::to($travelOrder->applicant_email)->send(new TravelOrderStatusUpdated($travelOrder));
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to send notification.'], 500);
+        }
+
+        return response()->json(['message' => 'Notification sent successfully.']);
     }
 }
