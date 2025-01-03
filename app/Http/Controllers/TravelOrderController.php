@@ -8,12 +8,21 @@ use App\Http\Requests\UpdateTravelOrderRequest;
 use App\Http\Resources\TravelOrderResource;
 use App\Models\TravelOrder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class TravelOrderController extends Controller
 {
-    public function index(IndexTravelOrderRequest $request)
+    public function index(IndexTravelOrderRequest $request): AnonymousResourceCollection|JsonResponse
     {
-        //
+        $filters = $request->validated();
+
+        $travelOrders = TravelOrder::query()->where('user_id', auth()->user()->id)->filter($filters)->paginate(10);
+
+        if ($travelOrders->isEmpty()) {
+            return response()->json(['message' => 'No travel orders found matching the provided criteria.'], 404);
+        }
+
+        return TravelOrderResource::collection($travelOrders);
     }
 
     public function show(TravelOrder $travelOrder): JsonResponse
