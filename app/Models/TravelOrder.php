@@ -6,6 +6,7 @@ use App\Enums\TravelOrderStatusEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TravelOrder extends Model
 {
@@ -23,6 +24,11 @@ class TravelOrder extends Model
     protected $casts = [
         'status' => TravelOrderStatusEnum::class,
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function scopeFilter(Builder $query, array $filters): Builder
     {
