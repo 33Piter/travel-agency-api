@@ -16,9 +16,13 @@ class TravelOrderController extends Controller
         //
     }
 
-    public function show(TravelOrder $travelOrder)
+    public function show(TravelOrder $travelOrder): JsonResponse
     {
-        //
+        if ($travelOrder->user_id !== auth()->id()) {
+            return response()->json(['message' => 'You are not authorized to view this travel order.'], 403);
+        }
+
+        return response()->json(new TravelOrderResource($travelOrder));
     }
 
     public function store(StoreTravelOrderRequest $request): JsonResponse
