@@ -158,4 +158,110 @@ class TravelOrderControllerTest extends TestCase
         $response->assertStatus(401)
             ->assertJson(['error' => 'The informed token is not valid or the user is not authorized. Please log in to access your travel orders.']);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tests for update method
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    public function test_user_can_update_travel_order_status()
+    {
+        $newStatus = TravelOrderStatusEnum::APPROVED->value;
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->patchJson(route('travel-order.update', $this->travelOrder->id), ['status' => $newStatus]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Travel order status updated successfully.',
+                'travel_order' => [
+                    'id' => $this->travelOrder->id,
+                    'status' => $newStatus,
+                ],
+            ]);
+
+        $this->assertDatabaseHas('travel_orders', [
+            'id' => $this->travelOrder->id,
+            'status' => $newStatus,
+        ]);
+    }
+
+    public function test_user_cannot_update_travel_order_status_with_same_status()
+    {
+        $travelOrder = TravelOrder::factory()->create([
+            'user_id' => $this->user->id,
+            'status' => TravelOrderStatusEnum::APPROVED->value,
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->patchJson(route('travel-order.update', $travelOrder->id), ['status' => TravelOrderStatusEnum::APPROVED->value]);
+
+        $response->assertStatus(400)
+            ->assertJson([
+                'message' => 'The travel order status is already set to '.TravelOrderStatusEnum::APPROVED->value.'.',
+            ]);
+
+        $this->assertDatabaseHas('travel_orders', [
+            'id' => $travelOrder->id,
+            'status' => TravelOrderStatusEnum::APPROVED->value,
+        ]);
+    }
+
+    public function test_user_cannot_update_travel_order_status_of_another_user()
+    {
+        $travelOrder = TravelOrder::factory()->create([
+            'user_id' => $this->otherUser->id,
+            'status' => TravelOrderStatusEnum::REQUESTED->value,
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->patchJson(route('travel-order.update', $travelOrder->id), ['status' => TravelOrderStatusEnum::APPROVED->value]);
+
+        $response->assertStatus(403)
+            ->assertJson([
+                'message' => 'You are not authorized to update this travel order.',
+            ]);
+
+        $this->assertDatabaseHas('travel_orders', [
+            'id' => $travelOrder->id,
+            'status' => TravelOrderStatusEnum::REQUESTED->value,
+        ]);
+    }
+
+    public function test_user_cannot_update_travel_order_status_with_invalid_data()
+    {
+        $invalidStatus = 'invalid_status';
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->patchJson(route('travel-order.update', $this->travelOrder->id), ['status' => $invalidStatus]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'status' => 'The status must be one of the following: '
+                    .TravelOrderStatusEnum::APPROVED->value.' or '.TravelOrderStatusEnum::CANCELED->value,
+            ]);
+
+        $this->assertDatabaseHas('travel_orders', [
+            'id' => $this->travelOrder->id,
+            'status' => TravelOrderStatusEnum::REQUESTED->value,
+        ]);
+    }
+
+    public function test_guest_cannot_update_travel_order_status()
+    {
+        $response = $this->patchJson(route('travel-order.update', $this->travelOrder->id), [
+            'status' => TravelOrderStatusEnum::APPROVED->value,
+        ]);
+
+        $response->assertStatus(401)
+            ->assertJson(['error' => 'The informed token is not valid or the user is not authorized. Please log in to access your travel orders.']);
+
+        $this->assertDatabaseHas('travel_orders', [
+            'id' => $this->travelOrder->id,
+            'status' => TravelOrderStatusEnum::REQUESTED->value,
+        ]);
+    }
+
 }
