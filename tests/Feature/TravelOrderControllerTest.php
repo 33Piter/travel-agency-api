@@ -45,6 +45,119 @@ class TravelOrderControllerTest extends TestCase
     }
 
     /*
+   |--------------------------------------------------------------------------
+   | Tests for index method
+   |--------------------------------------------------------------------------
+   |
+   */
+
+    public function test_can_list_paginated_travel_orders_with_no_filters()
+    {
+        TravelOrder::factory(15)->create(['user_id' => $this->user->id]);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->getJson(route('travel-order.index'));
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'applicant_name',
+                        'applicant_email',
+                        'destination',
+                        'departure_date',
+                        'return_date',
+                        'status',
+                    ],
+                ],
+                'meta',
+                'links',
+            ]);
+    }
+
+    public function test_can_filter_travel_orders_by_status()
+    {
+        TravelOrder::factory(5)->create([
+            'user_id' => $this->user->id,
+            'status' => TravelOrderStatusEnum::APPROVED->value,
+        ]);
+
+        TravelOrder::factory(5)->create([
+            'user_id' => $this->user->id,
+            'status' => TravelOrderStatusEnum::CANCELED->value,
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->getJson(route('travel-order.index', ['status' => TravelOrderStatusEnum::APPROVED->value]));
+
+        $response->assertStatus(200)
+            ->assertJsonCount(5, 'data')
+            ->assertJsonFragment(['status' => TravelOrderStatusEnum::APPROVED->value]);
+    }
+
+    public function test_can_filter_travel_orders_by_departure_date_range()
+    {
+        TravelOrder::factory()->create([
+            'user_id' => $this->user->id,
+            'departure_date' => '2025-01-15',
+        ]);
+
+        TravelOrder::factory()->create([
+            'user_id' => $this->user->id,
+            'departure_date' => '2025-02-10',
+        ]);
+
+        TravelOrder::factory()->create([
+            'user_id' => $this->user->id,
+            'departure_date' => '2025-03-01',
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->getJson(route('travel-order.index', [
+                'departure_date_start' => '2025-02-01',
+                'departure_date_end' => '2025-02-28',
+            ]));
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonFragment(['departure_date' => '2025-02-10']);
+    }
+
+    public function test_returns_404_if_no_travel_orders_match_filters()
+    {
+        TravelOrder::factory(10)->create(['user_id' => $this->user->id]);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->getJson(route('travel-order.index', ['departure_date_start' => '2100-01-01', 'departure_date_end' => '2100-12-31']));
+
+        $response->assertStatus(404)
+            ->assertJson(['message' => 'No travel orders found matching the provided criteria.']);
+    }
+
+    public function test_validates_request_data()
+    {
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
+            ->getJson(route('travel-order.index', [
+                'departure_date_start' => 'invalid-date',
+                'departure_date_end' => '2025-01-01',
+            ]));
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'departure_date_start' => 'The departure date start must be in the format YYYY-MM-DD.',
+            ]);
+    }
+
+    public function test_guest_cannot_access_travel_orders()
+    {
+        $response = $this->getJson(route('travel-order.index'));
+
+        $response->assertStatus(401)
+            ->assertJson(['error' => 'The informed token is not valid or the user is not authorized. Please log in to access your travel orders.']);
+    }
+
+    /*
     |--------------------------------------------------------------------------
     | Tests for create method
     |--------------------------------------------------------------------------
