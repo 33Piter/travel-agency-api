@@ -18,7 +18,7 @@ class TravelOrderController extends Controller
     {
         $filters = $request->validated();
 
-        $travelOrders = TravelOrder::query()->where('user_id', auth()->user()->id)->filter($filters)->paginate(10);
+        $travelOrders = auth()->user()->travelOrders()->filter($filters)->paginate(10);
 
         if ($travelOrders->isEmpty()) {
             return response()->json(['message' => 'No travel orders found matching the provided criteria.'], 404);
