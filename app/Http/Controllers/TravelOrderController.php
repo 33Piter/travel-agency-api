@@ -10,6 +10,7 @@ use App\Mail\TravelOrderStatusUpdated;
 use App\Models\TravelOrder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 
 class TravelOrderController extends Controller
@@ -29,9 +30,7 @@ class TravelOrderController extends Controller
 
     public function show(TravelOrder $travelOrder): JsonResponse
     {
-        if ($travelOrder->user_id !== auth()->id()) {
-            return response()->json(['message' => 'You are not authorized to view this travel order.'], 403);
-        }
+        Gate::authorize('view', $travelOrder);
 
         return response()->json(new TravelOrderResource($travelOrder));
     }
@@ -50,9 +49,7 @@ class TravelOrderController extends Controller
 
     public function update(UpdateTravelOrderRequest $request, TravelOrder $travelOrder): JsonResponse
     {
-        if ($travelOrder->user_id !== auth()->id()) {
-            return response()->json(['message' => 'You are not authorized to update this travel order.'], 403);
-        }
+        Gate::authorize('update', $travelOrder);
 
         $newStatus = $request->input('status');
 
@@ -73,9 +70,7 @@ class TravelOrderController extends Controller
 
     public function notify(TravelOrder $travelOrder): JsonResponse
     {
-        if ($travelOrder->user_id !== auth()->id()) {
-            return response()->json(['message' => 'You are not authorized to notify this travel order.'], 403);
-        }
+        Gate::authorize('notify', $travelOrder);
 
         try {
             Mail::to($travelOrder->applicant_email)->send(new TravelOrderStatusUpdated($travelOrder));
