@@ -15,9 +15,13 @@ class TravelOrderControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected User $otherUser;
+
     protected string $token;
+
     protected string $otherUserToken;
+
     protected TravelOrder $travelOrder;
 
     protected function setUp(): void
@@ -291,7 +295,7 @@ class TravelOrderControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'message' => 'Travel order status updated successfully.',
-                'travel_order' => [
+                'data' => [
                     'id' => $this->travelOrder->id,
                     'status' => $newStatus,
                 ],

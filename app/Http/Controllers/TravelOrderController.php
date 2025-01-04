@@ -11,6 +11,7 @@ use App\Models\TravelOrder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class TravelOrderController extends Controller
@@ -40,10 +41,7 @@ class TravelOrderController extends Controller
         $requestData = array_merge($request->validated(), ['user_id' => auth()->id()]);
         $travelOrder = TravelOrder::create($requestData);
 
-        return response()->json([
-            'message' => 'Travel order created successfully.',
-            'data' => new TravelOrderResource($travelOrder),
-        ], 201);
+        return $this->successResponse('Travel order created successfully.', new TravelOrderResource($travelOrder), 201);
     }
 
     public function update(UpdateTravelOrderRequest $request, TravelOrder $travelOrder): JsonResponse
@@ -53,18 +51,13 @@ class TravelOrderController extends Controller
         $newStatus = $request->input('status');
 
         if ($travelOrder->status->value === $newStatus) {
-            return response()->json([
-                'message' => 'The travel order status is already set to '.$newStatus.'.',
-            ], 400);
+            return $this->errorResponse('The travel order status is already set to '.$newStatus.'.');
         }
 
         $travelOrder->status = $newStatus;
         $travelOrder->save();
 
-        return response()->json([
-            'message' => 'Travel order status updated successfully.',
-            'travel_order' => $travelOrder,
-        ]);
+        return $this->successResponse('Travel order status updated successfully.', new TravelOrderResource($travelOrder));
     }
 
     public function notify(TravelOrder $travelOrder): JsonResponse
@@ -74,9 +67,23 @@ class TravelOrderController extends Controller
         try {
             Mail::to($travelOrder->applicant_email)->send(new TravelOrderStatusUpdated($travelOrder));
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to send notification.'], 500);
+            Log::error('Failed to send notification for travel order', [
+                'error' => $e->getMessage(),
+                'travel_order_id' => $travelOrder->id,
+            ]);
+            return $this->errorResponse('Failed to send notification.', 500);
         }
 
-        return response()->json(['message' => 'Notification sent successfully.']);
+        return $this->successResponse('Notification sent successfully.');
+    }
+
+    private function successResponse(string $message, $data = null, int $status = 200)
+    {
+        return response()->json(compact('message', 'data'), $status);
+    }
+
+    private function errorResponse(string $message, int $status = 400)
+    {
+        return response()->json(compact('message'), $status);
     }
 }
