@@ -37,8 +37,7 @@ class TravelOrderController extends Controller
 
     public function store(StoreTravelOrderRequest $request): JsonResponse
     {
-        $requestData = $request->validated();
-        $requestData['user_id'] = auth()->user()->id;
+        $requestData = array_merge($request->validated(), ['user_id' => auth()->id()]);
         $travelOrder = TravelOrder::create($requestData);
 
         return response()->json([
