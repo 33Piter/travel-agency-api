@@ -112,18 +112,18 @@ A Postman collection is included in the repository to simplify testing:
 
 ## API Endpoints Documentation
 
-| Endpoint                      | HTTP Method | Description                                                                                                                | Authentication Required |
-|-------------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------|--------------------------|
-| `/auth/register`              | POST        | Register a new user. No authentication required for this action.                                                           | No                       |
-| `/auth/login`                 | POST        | Login a user and retrieve the authentication token.                                                                        | No                       |
-| `/auth/logout`                | GET         | Logout the user and invalidate the authentication token.                                                                   | Yes                      |
-| `/auth/refresh`               | GET         | Refresh the authentication token to extend the user's session.                                                             | Yes                      |
-| `/auth/user`                  | GET         | Retrieve the authenticated user's information.                                                                             | Yes                      |
-| `/travel-order`               | POST        | Create a new travel order. Only the authenticated user can create orders.                                                  | Yes                      |
-| `/travel-order/{id}`          | GET         | Retrieve a specific travel order by ID. This will only return the order if the authenticated user owns it.                 | Yes                      |
-| `/travel-order`               | GET         | Search for travel orders. This will only show travel orders that the authenticated user owns. See all filters below.       | Yes                      |
-| `/travel-order/{id}?status`   | PUT         | Update a specific travel order by ID. The user can only update orders they own.                                            | Yes                      |
-| `/travel-order/notify/{id}`   | GET         | Notify the user associated with a travel order via email. This action is only permitted if the user owns the travel order. | Yes                      |
+| Endpoint                      | HTTP Method | Description                                                                                                                                                          | Authentication Required |
+|-------------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| `/auth/register`              | POST        | Register a new user. No authentication required for this action.                                                                                                     | No                       |
+| `/auth/login`                 | POST        | Login a user and retrieve the authentication token.                                                                                                                  | No                       |
+| `/auth/logout`                | GET         | Logout the user and invalidate the authentication token.                                                                                                             | Yes                      |
+| `/auth/refresh`               | GET         | Refresh the authentication token to extend the user's session.                                                                                                       | Yes                      |
+| `/auth/user`                  | GET         | Retrieve the authenticated user's information.                                                                                                                       | Yes                      |
+| `/travel-order`               | POST        | Create a new travel order. Only the authenticated user can create orders.                                                                                            | Yes                      |
+| `/travel-order/{id}`          | GET         | Retrieve a specific travel order by ID. This will only return the order if the authenticated user owns it.                                                           | Yes                      |
+| `/travel-order`               | GET         | Search for travel orders. This will only show travel orders that the authenticated user owns. The results are paginated (10 per page). See all search filters below. | Yes                      |
+| `/travel-order/{id}?status`   | PUT         | Update a specific travel order by ID. The user can only update orders they own.                                                                                      | Yes                      |
+| `/travel-order/notify/{id}`   | GET         | Notify the user associated with a travel order via email. This action is only permitted if the user owns the travel order.                                           | Yes                      |
 
 
 ## Filters for Travel Order Search
