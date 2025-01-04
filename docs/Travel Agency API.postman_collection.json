@@ -1,0 +1,375 @@
+{
+	"info": {
+		"_postman_id": "092e5a89-d882-4244-981c-022868e7afb1",
+		"name": "Travel Agency API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15023506"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "John Doe",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "johndoe@travelagency.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "password_confirmation",
+									"value": "password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "johndoe@travelagency.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create a Travel Order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "applicant_name",
+							"value": "Fulano de Tal",
+							"type": "text"
+						},
+						{
+							"key": "applicant_email",
+							"value": "teste@teste.com",
+							"type": "text"
+						},
+						{
+							"key": "destination",
+							"value": "Brasil",
+							"type": "text"
+						},
+						{
+							"key": "departure_date",
+							"value": "2025-01-05",
+							"type": "text"
+						},
+						{
+							"key": "return_date",
+							"value": "2025-01-06",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/travel-order",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"travel-order"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Show a Travel Order",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/travel-order/51",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"travel-order",
+						"51"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Travel Orders",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/travel-order",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"travel-order"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "requested",
+							"disabled": true
+						},
+						{
+							"key": "destination",
+							"value": "Brasil",
+							"disabled": true
+						},
+						{
+							"key": "departure_date_start",
+							"value": "2025-01-05",
+							"disabled": true
+						},
+						{
+							"key": "departure_date_end",
+							"value": "2025-05-01",
+							"disabled": true
+						},
+						{
+							"key": "return_date_start",
+							"value": "2025-01-01",
+							"disabled": true
+						},
+						{
+							"key": "return_date_end",
+							"value": "2025-05-01",
+							"disabled": true
+						},
+						{
+							"key": "date_range_start",
+							"value": "2025-01-01",
+							"disabled": true
+						},
+						{
+							"key": "date_range_end",
+							"value": "2025-02-19",
+							"disabled": true
+						},
+						{
+							"key": "page",
+							"value": "2",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a Travel Order Status",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/travel-order/51?status=approved",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"travel-order",
+						"51"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "approved"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Notify the Applicant",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/travel-order/notify/51",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"travel-order",
+						"notify",
+						"51"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:7001/api/v1",
+			"type": "string"
+		}
+	]
+}
