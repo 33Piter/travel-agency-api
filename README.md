@@ -1,66 +1,158 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Travel Agency API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is a RESTful API for managing travel orders, including user authentication, travel order creation, search with multiple parameters,
+status updates, mail notification, and more. The API is designed for use by travel agencies and their clients, with full 
+documentation provided below. 
 
-## About Laravel
+In this Laravel API example, we demonstrate the use of multiple Laravel features to build an API, including Routes, Resources, Middlewares, Policies, Eloquent ORM, Enums, Mailables, and more.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Table of Contents
+1. [Installation](#installation)
+2. [Running Locally](#running-locally)
+3. [Testing](#testing)
+4. [Postman Testing](#postman-testing)
+5. [API Endpoints Documentation](#api-endpoints-documentation)
+6. [Filters for Travel Order Search](#filters-for-travel-order-search)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Installation
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. **Clone the Repository**:
+    ```bash
+    git clone git@github.com:33Piter/travel-agency-api.git
+    cd travel-agency-api
+    ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Automated Installation (preferred)**:
+ - Run the installation script:
+    ```bash
+   chmod +x install.sh
+   ./install.sh
+    ```
+- _Optionally, run the script with --skip-tests to skip running tests._
 
-## Laravel Sponsors
+3. **Manual Installation**:
+- Install dependencies:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+  ```bash
+  composer install
+  ```
 
-### Premium Partners
+- Copy the example environment configuration:
+   ```bash
+   cp .env.example .env
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+- Start Docker containers with Laravel Sail:
+   ```bash
+   ./vendor/bin/sail up -d
+   ```
+  
+- Generate JWT secret:
+   ```bash
+   ./vendor/bin/sail artisan jwt:secret --force
+   ```
 
-## Contributing
+- Run tests (optional):
+   ```bash
+   ./vendor/bin/sail artisan test
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Running Locally
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. **Run the Application (it is already running if you follow the installation steps)**:
+- To start the application, use:
+   ```bash
+   ./vendor/bin/sail up -d
+   ```
 
-## Security Vulnerabilities
+- To stop the application, use:
+   ```bash
+   ./vendor/bin/sail down
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+2. **Optional Migration and Seeding:**
+- If you wish to populate the database with some fake users and travel orders, run migrations and seed:
+   ```bash
+   ./vendor/bin/sail artisan migrate --seed
+   ```
+By default, the applications runs on localhost port 7001. If you want to change the port, 
+you can do so by editing the APP_PORT variable in the .env file.
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Testing
+
+The application is covered by multiple tests. To run all tests, use the following command:
+- **Run all tests**:
+    ```bash
+    ./vendor/bin/sail artisan test
+    ```
+---
+
+## Postman Testing
+
+A Postman collection is included in the repository to simplify testing:
+1. **Import the Collection**:
+   Open Postman, go to "File > Import," and import the collection file located at `docs\Travel Agency API.postman_collection.json` in the repository.
+
+2. **Base URL**:
+   The default base url variable is set to 'http://localhost:7001/api/v1'. Change it if you are running the application on a different port.
+
+3. **Authentication**:
+    - Start with the `Register User` or `Login` endpoints to obtain an authentication token.
+    - Add the `Authorization` header with the token for secured endpoints.
+
+---
+
+## API Endpoints Documentation
+
+| Endpoint                      | HTTP Method | Description                                                                                                                | Authentication Required |
+|-------------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| `/auth/register`              | POST        | Register a new user. No authentication required for this action.                                                           | No                       |
+| `/auth/login`                 | POST        | Login a user and retrieve the authentication token.                                                                        | No                       |
+| `/auth/logout`                | GET         | Logout the user and invalidate the authentication token.                                                                   | Yes                      |
+| `/auth/refresh`               | GET         | Refresh the authentication token to extend the user's session.                                                             | Yes                      |
+| `/auth/user`                  | GET         | Retrieve the authenticated user's information.                                                                             | Yes                      |
+| `/travel-order`               | POST        | Create a new travel order. Only the authenticated user can create orders.                                                  | Yes                      |
+| `/travel-order/{id}`          | GET         | Retrieve a specific travel order by ID. This will only return the order if the authenticated user owns it.                 | Yes                      |
+| `/travel-order`               | GET         | Search for travel orders. This will only show travel orders that the authenticated user owns. See all filters below.       | Yes                      |
+| `/travel-order/{id}?status`   | PUT         | Update a specific travel order by ID. The user can only update orders they own.                                            | Yes                      |
+| `/travel-order/notify/{id}`   | GET         | Notify the user associated with a travel order via email. This action is only permitted if the user owns the travel order. | Yes                      |
+
+
+## Filters for Travel Order Search
+
+- **Departure date range**
+
+```departure_date_start```: Enter the start of the date range (format: YYYY-MM-DD).
+
+```departure_date_end```: Enter the end of the date range (format: YYYY-MM-DD, must be after or equal to ```departure_date_start```).
+
+- **Return date range**
+
+```return_date_start```: Enter the start of the date range (format: YYYY-MM-DD).
+
+```return_date_end```: Enter the end of the date range (format: YYYY-MM-DD, must be after or equal to ```return_date_start```).
+
+- **Date range (both departure and return)**
+
+```date_range_start```: Enter the start of the date range (format: YYYY-MM-DD).
+
+```date_range_end```: Enter the end of the date range (format: YYYY-MM-DD, must be after or equal to ```date_range_start```).
+
+- **Status**
+
+```status```: Filter by travel order status. It must be one of the following values: 'requested', 'approved' or 'canceled'.
+
+- **Destination**
+
+```destination```: Filter by the destination of the travel order.
+
+
+
